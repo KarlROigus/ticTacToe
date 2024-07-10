@@ -1,15 +1,23 @@
 const gameBoard = (function() {
 
-    const board = [["", "", ""], ["", "", ""], ["", "", ""]];
+    let movesMade = 0;
+
+    const board = [["x", "o", "x"], ["o", "x", "o"], ["x", "o", "x"]];
 
     const getBoardState = function() {
         return board;
     }
 
+    const getAmountOfMovesMade = function() {
+        return movesMade;
+    }
+
     const appendSymbolToBoard = function(symbolToBeAdded, row, column) {
         board[row][column] = symbolToBeAdded;
+        movesMade++;
     }
-    return {getBoardState, appendSymbolToBoard};
+    return {getBoardState, appendSymbolToBoard, getAmountOfMovesMade};
+
 })();
 
 
@@ -21,10 +29,10 @@ function checkIfSomebodyHasWonTheGame(boardState) {
     } else if (checkForWinByDiagonals(boardState)) {
         return "Win by diagonal";
     }
+    return "No win yet";
 }
 
 function checkForWinByRows(board) {
-
     if (board[0][0] === board[0][1] && board[0][1] === board[0][2] && isNotAnEmptyString(board[0][0])) {
         return true;
     } else if (board[1][0] === board[1][1] && board[1][1] === board[1][2] && isNotAnEmptyString(board[1][0])) {
@@ -37,7 +45,6 @@ function checkForWinByRows(board) {
 
 
 function checkForWinByColumns(board) {
-
     if (board[0][0] === board[1][0] && board[1][0] === board[2][0] && isNotAnEmptyString(board[0][0])) {  
         return true;
     } else if (board[0][1] === board[1][1] && board[1][1] === board[2][1] && isNotAnEmptyString(board[0][1])) {
@@ -61,13 +68,38 @@ function isNotAnEmptyString(element) {
     return element != "";
 }
 
+function createPlayer(name) {
+    const playerName = name;
+    
+    const getPlayerName = function() {
+        return playerName;
+    }
 
-console.log(gameBoard.getBoardState());
-gameBoard.appendSymbolToBoard("o", 0, 2);
-gameBoard.appendSymbolToBoard("o", 1, 1);
-gameBoard.appendSymbolToBoard("o", 2, 2);
-console.log(gameBoard.getBoardState());
-console.log(checkIfSomebodyHasWonTheGame(gameBoard.getBoardState()));
+    return {getPlayerName};
+};
+
+const showArrayOnDisplay = (function() {
+    const stateOfBoard = gameBoard.getBoardState();
+    const boardDiv = document.querySelector(".board");
+    for (let i = 0; i < stateOfBoard.length; i++) {
+        const row = stateOfBoard[i];
+        for (let j = 0; j < row.length; j++) {
+            const runner = document.createElement("div");
+            runner.textContent = row[j];
+            boardDiv.appendChild(runner);
+        }
+        
+    };
+})();
+
+
+
+
+
+
+
+
+
 
 
 
