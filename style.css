@@ -74,5 +74,10 @@ input:focus {
     height: 150px;
 }
 
+.announcer {
+    margin-top: 20px;
+    justify-self: center;
+}
+
 
 

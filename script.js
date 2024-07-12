@@ -89,6 +89,7 @@ const showArrayContentOnDisplay = (function() {
         const row = stateOfBoard[i];
         for (let j = 0; j < row.length; j++) {
             const runner = document.createElement("button");
+            runner.className = "square";
             runner.textContent = row[j];
             boardDiv.appendChild(runner);
         }
@@ -119,9 +120,20 @@ const game = (function() {
         playerTwo.isHisTurn = !playerTwo.isHisTurn;
     }
 
+    const startGameIfConditionsAreMet = function() {
+        const playerOne = Player(document.querySelector("#playerOne").value);
+        const playerTwo = Player(document.querySelector("#playerTwo").value);
+        if (playerOne.getPlayerName() != "" && playerTwo.getPlayerName() != "") {
+            game.insertPlayers(playerOne, playerTwo);
+            const startButton = document.querySelector(".startGame");
+            startButton.removeEventListener("click", startGameIfConditionsAreMet);
+            game.play();
+        };
+    };
+
     const play = function() {
         showArrayContentOnDisplay();
-        const gridButtons = document.querySelectorAll("button");
+        const gridButtons = document.querySelectorAll(".square");
 
         const handleButtonClick = function(event) {
             const btn = event.target;
@@ -135,7 +147,14 @@ const game = (function() {
         });
     }
 
-    return {play, insertPlayers, getPlayerOne, getPlayerTwo, togglePlayersTurn};
+    const resetGame = function() {
+        const gridButtons = document.querySelectorAll(".square");
+        gridButtons.forEach(element => {
+            element.textContent = "";
+        });
+    }
+
+    return {play, insertPlayers, getPlayerOne, getPlayerTwo, togglePlayersTurn, startGameIfConditionsAreMet, resetGame};
 })();
 
 
@@ -149,15 +168,7 @@ function setButtonsTextContent(playerOne, btn) {
 
 
 const startButton = document.querySelector(".startGame");
-startButton.addEventListener("click", () => {
-    const playerOne = Player(document.querySelector("#playerOne").value);
-    const playerTwo = Player(document.querySelector("#playerTwo").value);
-    if (playerOne.getPlayerName() != "" && playerTwo.getPlayerName() != "") {
-        game.insertPlayers(playerOne, playerTwo);
-        game.play();
-    }
-
-})
+startButton.addEventListener("click", game.startGameIfConditionsAreMet);
 
 
 
