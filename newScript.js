@@ -22,11 +22,19 @@ const gameBoard = (function() {
         return board;
     }
 
+    const resetBoard = function() {
+        for (let i = 0; i < board.length; i++) {
+            for (let j = 0; j < board[i].length; j++) {
+                board[i][j] = "";
+            }
+        }
+    }
+
 
     const appendSymbolToBoard = function(symbolToBeAdded, row, column) {
         board[row][column] = symbolToBeAdded;
     }
-    return {getBoardState, appendSymbolToBoard};
+    return {getBoardState, appendSymbolToBoard, resetBoard};
 
 });
 
@@ -39,6 +47,12 @@ const game = function() {
 
     let whoseTurnItIs;
     let winner;
+
+    const resetBoard = function() {
+        board.resetBoard();
+        movesMade = 0;
+        whoseTurnItIs = playerOne;
+    }
 
     const setPlayerOne = function(firstInput) {
         playerOne = player(firstInput, "x");
@@ -142,13 +156,22 @@ const game = function() {
             }
         }
     };
-    return {changeWhoseTurnItIs, getWhoseTurnItIs, playRound, showArrayContentOnScreen, getWinner, setPlayerOne, setPlayerTwo, getAmountOfMovesMade};
+    return {changeWhoseTurnItIs, getWhoseTurnItIs, playRound, showArrayContentOnScreen, getWinner, setPlayerOne, setPlayerTwo,
+        getAmountOfMovesMade, resetBoard};
 }
 
 function ScreenController() {
     let boardGame = game();
 
     const announcer = document.querySelector(".announcer");
+
+    const resetButton = document.querySelector(".resetGame");
+    resetButton.addEventListener("click", () => {
+        boardGame.resetBoard();
+        boardGame.showArrayContentOnScreen();
+        announcer.textContent = boardGame.getWhoseTurnItIs().getPlayerName() + "'s turn";
+        addEventHandlersToCells();
+    })
 
     const startButton = document.querySelector(".startGame");
     startButton.addEventListener("click", () => {
@@ -160,33 +183,33 @@ function ScreenController() {
         announcer.textContent = boardGame.getWhoseTurnItIs().getPlayerName() + "'s turn";
         boardGame.showArrayContentOnScreen();
         addEventHandlersToCells();
-
-        function addEventHandlersToCells() {
-            const gameCells = document.querySelectorAll(".square");
-            gameCells.forEach(cell => {
-                if (cell.textContent == "") {
-                    cell.addEventListener("click", handleTheClick);
-                }
-            });
-        };
-
-        function handleTheClick(event) {
-            const row = event.target.dataset.row;
-            const column = event.target.dataset.column;
-            boardGame.playRound(row, column);
-            let winnerObject = boardGame.getWinner();
-            boardGame.showArrayContentOnScreen();
-            if (boardGame.getAmountOfMovesMade() == 9) {
-                announcer.textContent = "ITS A DRAW!";
-            } else if (typeof winnerObject != "string") {
-                announcer.textContent = boardGame.getWhoseTurnItIs().getPlayerName() + " WINS THE GAME!";
-            } else {
-                announcer.textContent = boardGame.getWhoseTurnItIs().getPlayerName() + "'s turn";
-                addEventHandlersToCells();
-            }
-        };
-    
+        
     });
+
+    function addEventHandlersToCells() {
+        const gameCells = document.querySelectorAll(".square");
+        gameCells.forEach(cell => {
+            if (cell.textContent == "") {
+                cell.addEventListener("click", handleTheClick);
+            }
+        });
+    };
+
+    function handleTheClick(event) {
+        const row = event.target.dataset.row;
+        const column = event.target.dataset.column;
+        boardGame.playRound(row, column);
+        let winnerObject = boardGame.getWinner();
+        boardGame.showArrayContentOnScreen();
+        if (boardGame.getAmountOfMovesMade() == 9) {
+            announcer.textContent = "ITS A DRAW!";
+        } else if (typeof winnerObject != "string") {
+            announcer.textContent = boardGame.getWhoseTurnItIs().getPlayerName() + " wins the game!";
+        } else {
+            announcer.textContent = boardGame.getWhoseTurnItIs().getPlayerName() + "'s turn";
+            addEventHandlersToCells();
+        }
+    };
 
 
 }
